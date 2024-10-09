@@ -1,0 +1,74 @@
+source venv/bin/activate
+uvicorn src.main:app --reload
+pip install sqlalchemy alembic psycopg2
+pip install fastapi-users[sqlalchemy]
+alembic init migrations
+alembic revision --autogenerate -m "Database creation"
+alembic upgrade head
+pip install acyncpg
+
+   Redis
+pip install fastapi-cache2[redis](не актуально)
+
+    Celery
+celery -A src.tasks.tasks:celery worker --loglevel=INFO --pool=solo
+celery -A src.tasks.tasks:celery flower
+
+    Tests
+pip install pytest pytest-asyncio
+pytest -v tests/
+
+    Linux
+ sudo lsof -i :8000
+ sudo netstat -tuln | grep 5432
+sudo -i -u postgres
+psql
+\conninfo
+
+    Docker
+ FROM python:latest
+
+RUN mkdir /fastapi_app
+
+WORKDIR /fastapi_app
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY . .
+
+RUN chmod a+x docker/*.sh
+
+RUN alembic upgrade head
+
+WORKDIR src
+
+CMD gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
+
+ docker build . -t test_project:latest
+docker run -d -p 7329:8000 fastapi_app
+ docker logs 5a9d64b00581bfbc554bd7bc96d50c1b42a97ee99ed137613eac75ab4ce9fbfb
+ls -lh
+
+
+
+
+ docker run -p 5432:5432 --name TestProject -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=TestProject -d postgres:13.3
+
+   GIT
+rm -rf .git
+git pull origin main --allow-unrelated-histories
+
+{
+  "full_name": "Test_user",
+  "email": "test@gmail.com",
+  "password": "12345678"
+}
+
+{
+  "full_name": "test_superuser",
+  "email": "superuser@gmail.com",
+  "password": "12345678",
+  "is_superuser": true
+}

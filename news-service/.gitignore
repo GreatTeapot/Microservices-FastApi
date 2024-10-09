@@ -1,0 +1,6 @@
+.env
+.idea
+.venv
+.env-non-dev
+.pytest_cache
+__pycache__

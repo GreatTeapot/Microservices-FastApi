@@ -1,0 +1,36 @@
+name: docker_news
+
+services:
+  db:
+    image: postgres
+    container_name: db
+    ports:
+      - "5412:5432"
+    env_file:
+      - .env-non-dev
+    volumes:
+      - .postgres:/var/lib/postgres/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    # restart: unless-stopped
+
+  app:
+     container_name: my_app
+     build:
+       context: .
+     depends_on:
+       db:
+         condition: service_healthy
+     command: ["bash" ,"/app/docker/app.sh"]
+     ports:
+       - 9999:8000
+     restart: always
+     env_file:
+       - .env-non-dev
+
+
+
+
